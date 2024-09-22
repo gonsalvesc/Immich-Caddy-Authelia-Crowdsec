@@ -1,0 +1,37 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    environment:
+      COLLECTIONS: "crowdsecurity/linux crowdsecurity/caddy gauth-fr/immich LePresidente/authelia"
+      TZ: America/Toronto
+      LEVEL_INFO: true
+    volumes:
+      - crowdsec-db:/var/lib/crowdsec/data/
+      - crowdsec-config:/etc/crowdsec/
+      - ./config/acquis.yaml:/etc/crowdsec/acquis.yaml:ro
+      - ./config/mywhitelists.yaml:/etc/crowdsec/parsers/s02-enrich/mywhitelists.yaml
+      - caddy_caddy-logs:/var/log/caddy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - authelia_authelia-logs:/var/log/authelia:ro
+    networks:
+      caddy-network:
+        ipv4_address: 172.50.0.20
+      default:
+    restart: always
+    security_opt:
+      - no-new-privileges=true
+
+volumes:
+  crowdsec-db:
+  crowdsec-config:
+  caddy_caddy-logs:
+    external: true
+  authelia_authelia-logs:
+    external: true
+
+networks:
+  caddy-network:
+    external: true
+  default:
+    name: crowdsec-network

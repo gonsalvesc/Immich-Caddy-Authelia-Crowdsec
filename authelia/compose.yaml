@@ -1,0 +1,24 @@
+
+services:
+
+  authelia:
+    image: authelia/authelia:4.37
+    container_name: authelia
+    volumes:
+      - ./config:/config
+      - authelia-logs:/var/log/authelia
+      - /myDrive/docker-volumes/authelia/auth-data:/data
+    networks:
+      caddy-network:
+        ipv4_address: 172.50.0.8
+    restart: always
+    environment:
+      - TZ=America/Toronto
+    ports:
+      - 9091:9091
+networks:
+  caddy-network:
+    external: true
+
+volumes:
+  authelia-logs:

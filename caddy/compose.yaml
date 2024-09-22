@@ -1,0 +1,39 @@
+
+services:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: always
+    ports:
+      - 443:443
+      - 443:443/udp
+      - 2019:2019
+    volumes:
+      - /opt/caddy/caddy:/usr/bin/caddy:ro
+      - caddy-data:/data
+      - caddy-config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-logs:/var/log/caddy
+    env_file: .env
+    networks:
+      default:
+        ipv4_address: 172.50.0.100
+    security_opt:
+      - no-new-privileges=true
+    cap_add:
+      - NET_ADMIN
+    healthcheck:
+      test: ["CMD", "caddy", "version"]
+
+volumes:
+  caddy-data:
+  caddy-config:
+  caddy-logs:
+
+networks:
+  default:
+    name: caddy-network
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.50.0.0/24
